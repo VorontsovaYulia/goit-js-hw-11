@@ -1,7 +1,7 @@
 import axios from 'axios';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
-
+import Notiflix, { Notify } from 'notiflix';
 
 
 const API_KEY = "38157746-35969d34d7ab2e6c4c682cf10";
@@ -10,7 +10,7 @@ const formSearch = document.querySelector('.flex-form');
 const listGallery = document.querySelector('.gallery');
 // const inputEl = document.querySelector("input")
 const BASE_URL = 'https://pixabay.com/api/';
-
+let page = 1;
 
 
 formSearch.addEventListener('submit', onSubmit);
@@ -19,6 +19,7 @@ formSearch.addEventListener('submit', onSubmit);
 
 function onSubmit(evt) {
   evt.preventDefault();
+  listGallery.innerHTML = "";
   console.dir(evt.currentTarget.elements.query.value)
     const input = evt.currentTarget.elements.query.value;
   
@@ -27,20 +28,28 @@ function onSubmit(evt) {
 }
 
 async function inputSearch(input) {
+  
     const response = await axios.get(`${BASE_URL}`, {
         params: {
             key: API_KEY,
             q: `${input}`,
             image_type: "photo",
             orientation: "horizontal",
-            safesearch: true
+        safesearch: true,
+            page: `${page}`,
+            per_page: 40
         }
     })
     
   .then(function (response) {
       
-      const { hits,  totalHits} = response.data;
-      
+    const { hits, totalHits } = response.data;
+    console.dir(hits)
+    if (hits.length === 0) {
+      Notify.failure("We're sorry, but you've reached the end of search results.");
+      return;
+    }
+      Notify.success(`Hooray! We found ${totalHits} images.`)
       createMarkup(hits);    
   })
   .catch(function (error) {
@@ -49,7 +58,7 @@ async function inputSearch(input) {
   })
 }
 
-async function createMarkup(data) {
+function createMarkup(data) {
     const card = data.map(obj => {
         return `  
     <a class = "gallery__link" href="${obj.largeImageURL}"><img class = "gallery__image" src="${obj.webformatURL}" alt="${obj.tags}" title=""/>
