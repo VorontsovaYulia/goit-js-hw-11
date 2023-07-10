@@ -1,31 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 
-*,
-*:before,
-*:after {
-    -webkit-box-sizing: inherit;
-    -moz-box-sizing: inherit;
-    box-sizing: inherit;
+:root {
+    --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --animation-duration: 250ms;
 }
 
-
-::-webkit-input-placeholder {
-    color: #56585b;
-}
-
-::-moz-placeholder {
-    color: #56585b;
-}
-
-:-moz-placeholder {
-    color: #56585b;
-}
-
-html {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
 
 body {
     font-family: 'Lato', sans-serif;
@@ -35,13 +14,6 @@ body {
     -moz-background-size: cover;
     background-size: cover;
     color: #0a0a0b;
-    /* overflow: hidden; */
-}
-
-ul,
-nav {
-    list-style: none;
-    padding: 0;
 }
 
 a {
@@ -62,70 +34,11 @@ h1 {
     margin: 0 0 1.5rem;
 }
 
-i {
-    font-size: 1.3rem;
-}
-
-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #fff;
-    padding: 10px 100px 0;
-}
-
-header nav ul {
-    display: flex;
-}
-
-header nav li {
-    margin: 0 15px;
-}
-
-header nav li:first-child {
-    margin-left: 0;
-}
-
-header nav li:last-child {
-    margin-right: 0;
-}
-
-a.btn {
-    color: #fff;
-    padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    -webkit-transition: all 0.2s;
-    -moz-transition: all 0.2s;
-    transition: all 0.2s;
-}
-
-a.btn:hover {
-    background: #d73851;
-    border: 1px solid #d73851;
-    color: #fff;
-}
-
 .cover {
-    /* height: 100vh;
-    width: 100%; */
     background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.05)), to(rgba(0, 0, 0, 0)));
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
     padding: 20px 50px;
-    /* display: -webkit-box;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    flex-direction: column;
-    -webkit-box-pack: center;
-    justify-content: center;
-    -webkit-box-align: center;
-    align-items: center; */
 }
 
 .flex-form input[type="submit"] {
@@ -161,24 +74,10 @@ a.btn:hover {
     font-size: 1rem;
     border-radius: 0;
     outline: 0;
-    -webkit-appearance: none;
 }
 
 input[type="search"] {
     flex-basis: 500px;
-}
-
-/* #madeby {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding: 25px 100px;
-    color: #fff;
-} */
-
-:root {
-    --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    --animation-duration: 250ms;
 }
 
 .gallery {
@@ -203,7 +102,6 @@ input[type="search"] {
 }
 
 .gallery__image {
-   
     height: 100%;
     width: 100%;
     vertical-align: bottom;
@@ -222,16 +120,12 @@ input[type="search"] {
 }
 
 .info {
-        display: flex;
-            justify-content: center;
-            gap: 16px;
-            padding-left: 20px;
-            padding-right: 20px;
-            background-color: rgba(18, 16, 9, 0.5);           
-}
-
-.info-item {
-
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: rgba(18, 16, 9, 0.5);           
 }
 
 .photo-card {
@@ -239,6 +133,7 @@ input[type="search"] {
 }
 
 @media all and (max-width:800px) {
+
     body {
         font-size: 0.9rem;
     }
@@ -255,17 +150,6 @@ input[type="search"] {
         font-size: 0.9rem;
     }
 
-    header {
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        flex-direction: column;
-        padding: 10px !important;
-    }
-
-    header h2 {
-        margin-bottom: 15px;
-    }
-
     h1 {
         font-size: 2rem;
     }
@@ -273,16 +157,9 @@ input[type="search"] {
     .cover {
         padding: 20px;
     }
-/* 
-    #madeby {
-        padding: 30px 20px;
-    } */
 }
 
 @media all and (max-width:360px) {
-    header nav li {
-        margin: 0 10px;
-    }
 
     .flex-form {
         display: -webkit-box;
