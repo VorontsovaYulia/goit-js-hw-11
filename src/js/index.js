@@ -2,61 +2,79 @@ import axios from 'axios';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import Notiflix, { Notify } from 'notiflix';
-
-
-const API_KEY = "38157746-35969d34d7ab2e6c4c682cf10";
+import simpleLightbox from 'simplelightbox';
 
 const formSearch = document.querySelector('.flex-form');
 const listGallery = document.querySelector('.gallery');
-// const inputEl = document.querySelector("input")
+const API_KEY = "38157746-35969d34d7ab2e6c4c682cf10";
 const BASE_URL = 'https://pixabay.com/api/';
-let page = 1;
 
+let page = 1;
+let input;
+let counetHits = 0;
+let totHits;
+let per_page = 40;
 
 formSearch.addEventListener('submit', onSubmit);
 
-
-
 function onSubmit(evt) {
   evt.preventDefault();
-  listGallery.innerHTML = "";
-  console.dir(evt.currentTarget.elements.query.value)
-    const input = evt.currentTarget.elements.query.value;
-  
 
-    inputSearch(input);
+  listGallery.innerHTML = "";
+  totHits;
+  counetHits = 0;
+  page = 1;
+
+    input = evt.currentTarget.elements.query.value;
+    inputSearch(input, page,per_page);
 }
 
-async function inputSearch(input) {
+async function inputSearch(input, page, per_page) {
+  if (counetHits === totHits) {
+    Notify.success(`We're sorry, but you've reached the end of search results.`);
+    return;
+  }
+   if (counetHits === 480) {
+     per_page = 20;
+   }
+  
+  window.addEventListener('scroll', onScroll)
   
     const response = await axios.get(`${BASE_URL}`, {
         params: {
-            key: API_KEY,
-            q: `${input}`,
-            image_type: "photo",
-            orientation: "horizontal",
-        safesearch: true,
-            page: `${page}`,
-            per_page: 40
+          key: API_KEY,
+          q: `${input}`,
+          image_type: "photo",
+          orientation: "horizontal",
+          safesearch: true,
+          page: `${page}`,
+          per_page: `${per_page}`
         }
     })
     
   .then(function (response) {
       
     const { hits, totalHits } = response.data;
-    console.dir(hits)
+    counetHits += hits.length;
+    totHits = totalHits;
+    
     if (hits.length === 0) {
       Notify.failure("We're sorry, but you've reached the end of search results.");
       return;
-    }
+
+    } else if (page === 1) {
+      totHits = totalHits;
       Notify.success(`Hooray! We found ${totalHits} images.`)
-      createMarkup(hits);    
+    } 
+
+    createMarkup(hits);
+        
   })
   .catch(function (error) {
 
     console.log(error);
   })
-}
+}      
 
 function createMarkup(data) {
     const card = data.map(obj => {
@@ -81,11 +99,25 @@ function createMarkup(data) {
   </a>`    
     }).join("")
    
-    listGallery.insertAdjacentHTML("beforeend", card)
+  listGallery.insertAdjacentHTML("beforeend", card)
     
-    const lightbox = new SimpleLightbox('.gallery a', {
+  const lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
     captionsData: "alt",
-});
+  });
+  lightbox.refresh();
 }
 
+function onScroll() {
+    const {
+        scrollTop,
+        scrollHeight,
+        clientHeight
+    } = document.documentElement
+  
+  if (scrollTop + clientHeight >= scrollHeight - 5) {
+    page += 1;  
+    inputSearch(input, page, per_page)
+    
+    }
+  }
