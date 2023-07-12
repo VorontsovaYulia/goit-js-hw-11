@@ -2,7 +2,6 @@ import axios from 'axios';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import Notiflix, { Notify } from 'notiflix';
-import simpleLightbox from 'simplelightbox';
 
 const formSearch = document.querySelector('.flex-form');
 const listGallery = document.querySelector('.gallery');
@@ -11,9 +10,10 @@ const BASE_URL = 'https://pixabay.com/api/';
 
 let page = 1;
 let input;
-let counetHits = 0;
+let countHits = 0;
 let totHits;
 let per_page = 40;
+let totalPage = 0;
 
 formSearch.addEventListener('submit', onSubmit);
 
@@ -22,7 +22,7 @@ function onSubmit(evt) {
 
   listGallery.innerHTML = "";
   totHits;
-  counetHits = 0;
+  countHits = 0;
   page = 1;
 
     input = evt.currentTarget.elements.query.value;
@@ -30,16 +30,15 @@ function onSubmit(evt) {
 }
 
 async function inputSearch(input, page, per_page) {
-  if (counetHits === totHits) {
-    Notify.success(`We're sorry, but you've reached the end of search results.`);
-    return;
-  }
-   if (counetHits === 480) {
-     per_page = 20;
-   }
   
   window.addEventListener('scroll', onScroll)
-  
+  totalPage = Math.ceil(totHits / per_page)
+
+  if (totalPage === page) {
+    Notify.info(`We're sorry, but you've reached the end of search results.`);
+    window.removeEventListener('scroll', onScroll)
+    return;
+  }
     const response = await axios.get(`${BASE_URL}`, {
         params: {
           key: API_KEY,
@@ -51,15 +50,15 @@ async function inputSearch(input, page, per_page) {
           per_page: `${per_page}`
         }
     })
-    
+      
   .then(function (response) {
       
     const { hits, totalHits } = response.data;
-    counetHits += hits.length;
+    countHits += hits.length;
     totHits = totalHits;
     
     if (hits.length === 0) {
-      Notify.failure("We're sorry, but you've reached the end of search results.");
+      Notify.failure("Sorry, there are no images matching your search query. Please try again.");
       return;
 
     } else if (page === 1) {
@@ -70,33 +69,33 @@ async function inputSearch(input, page, per_page) {
     createMarkup(hits);
         
   })
-  .catch(function (error) {
-
-    console.log(error);
-  })
+    .catch(function (error) {
+      console.log(error);
+    })
 }      
 
 function createMarkup(data) {
     const card = data.map(obj => {
         return `  
-    <a class = "gallery__link" href="${obj.largeImageURL}"><img class = "gallery__image" src="${obj.webformatURL}" alt="${obj.tags}" title=""/>
+  <a class = "gallery__link" href="${obj.largeImageURL}">
+  <img class = "gallery__image" src="${obj.webformatURL}" alt="${obj.tags}" title=""/>
   <div class="photo-card gallery__item">
     <div class="info">
-    <p class="info-item">
+     <p class="info-item">
       <b>Likes: ${obj.likes}</b>
-    </p>
-    <p class="info-item">
+     </p>
+     <p class="info-item">
       <b>Views: ${obj.views}</b>
-    </p>
-    <p class="info-item">
+     </p>
+     <p class="info-item">
       <b>Comments: ${obj.comments}</b>
-    </p>
-    <p class="info-item">
+     </p>
+     <p class="info-item">
       <b>Downloads: ${obj.downloads}</b>
-    </p>
-  </div>
-  </div>
-  </a>`    
+     </p>
+   </div>
+ </div>
+ </a>`    
     }).join("")
    
   listGallery.insertAdjacentHTML("beforeend", card)
@@ -118,6 +117,5 @@ function onScroll() {
   if (scrollTop + clientHeight >= scrollHeight - 5) {
     page += 1;  
     inputSearch(input, page, per_page)
-    
-    }
+   }
   }
