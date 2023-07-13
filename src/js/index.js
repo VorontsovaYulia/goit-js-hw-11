@@ -1,18 +1,23 @@
-import axios from 'axios';
+import axios from "axios";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import Notiflix, { Notify } from 'notiflix';
 
-const formSearch = document.querySelector('.flex-form');
-const listGallery = document.querySelector('.gallery');
 const API_KEY = "38157746-35969d34d7ab2e6c4c682cf10";
 const BASE_URL = 'https://pixabay.com/api/';
 
+
+const formSearch = document.querySelector('.flex-form');
+const listGallery = document.querySelector('.gallery');
+
+
 let page = 1;
+let currentPage;
 let input;
 let countHits = 0;
 let totHits;
 let per_page = 40;
+
 let totalPage = 0;
 
 formSearch.addEventListener('submit', onSubmit);
@@ -21,24 +26,40 @@ function onSubmit(evt) {
   evt.preventDefault();
 
   listGallery.innerHTML = "";
-  totHits;
+  totHits = undefined;
   countHits = 0;
   page = 1;
-
-    input = evt.currentTarget.elements.query.value;
-    inputSearch(input, page,per_page);
+  currentPage;
+  totalPage = 0;
+  countHits = 0;
+  input = "";
+  
+  input = evt.currentTarget.elements.query.value;
+  if (input === "") {
+    Notify.info("Please, enter a request")
+    return;
+  }
+  
+  inputSearch(input, page, per_page, totHits,totalPage);
+   
 }
 
 async function inputSearch(input, page, per_page) {
   
-  window.addEventListener('scroll', onScroll)
-  totalPage = Math.ceil(totHits / per_page)
+  window.addEventListener('scroll', onScroll);
 
+  if (totHits < per_page) {
+    window.removeEventListener('scroll', onScroll);
+    Notify.info(`We're sorry, but you've reached the end of search results.`);
+    return;
+
+  }
   if (totalPage === page) {
     Notify.info(`We're sorry, but you've reached the end of search results.`);
-    window.removeEventListener('scroll', onScroll)
-    return;
+    window.removeEventListener('scroll', onScroll);
+  
   }
+  
     const response = await axios.get(`${BASE_URL}`, {
         params: {
           key: API_KEY,
@@ -54,6 +75,7 @@ async function inputSearch(input, page, per_page) {
   .then(function (response) {
       
     const { hits, totalHits } = response.data;
+    totalPage = Math.ceil(totalHits / per_page);
     countHits += hits.length;
     totHits = totalHits;
     
@@ -67,12 +89,15 @@ async function inputSearch(input, page, per_page) {
     } 
 
     createMarkup(hits);
-        
-  })
-    .catch(function (error) {
-      console.log(error);
+    
     })
-}      
+  .catch(function (error) {
+    console.log(error);
+
+    })
+} 
+
+
 
 function createMarkup(data) {
     const card = data.map(obj => {
@@ -98,7 +123,7 @@ function createMarkup(data) {
  </a>`    
     }).join("")
    
-  listGallery.insertAdjacentHTML("beforeend", card)
+  listGallery.insertAdjacentHTML("beforeend", card);
     
   const lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
@@ -115,7 +140,10 @@ function onScroll() {
     } = document.documentElement
   
   if (scrollTop + clientHeight >= scrollHeight - 5) {
-    page += 1;  
-    inputSearch(input, page, per_page)
+    currentPage += 1;
+    page += 1;
+
+    inputSearch(input, page, per_page);
+    
    }
-  }
+ }
